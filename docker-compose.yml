@@ -1,0 +1,46 @@
+version: "3.7"
+
+services:
+  php:
+    build:
+      context: ./docker
+      dockerfile: Dockerfile
+    volumes:
+      - .:/var/www/html/
+    ports:
+      - "80:80"
+#  apache:
+#    build: ./docker/apache/
+#    depends_on:
+#      - php
+#      - mysql
+#    ports:
+#      - "80:80"
+    # volumes:
+      # - ./public_html/www/:/var/www/html/
+      #- ./log:/var/log/apache2
+  mysql:
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: '${DB_NAME}'
+      MYSQL_USER: '${DB_USER}'
+      MYSQL_PASSWORD: '${DB_PASSWORD}'
+      MYSQL_ROOT_PASSWORD: root
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    links:
+      - mysql
+    environment:
+      PMA_HOST: 'mysql'
+      PMA_PORT: '3306'
+      PMA_USER: '${DB_USER}'
+      PMA_PASSWORD: '${DB_PASSWORD}'
+    ports:
+      - '8080:80'
+  mailhog:
+    image: 'mailhog/mailhog:latest'
+    ports:
+      - '1025:1025'
+      - '8025:8025'
